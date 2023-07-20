@@ -3,7 +3,8 @@ var nsqChannel, nsq, nsqOptions;
 nsq = require('nsqjs');
 nsqChannel = 'nsq-view';
 nsqOptions = {
-  lookupdHTTPAddresses: (process.env.NSQ_VIEW_LOOKUPDHTTP || '127.0.0.1:4161')
+  lookupdHTTPAddresses: (process.env.NSQ_VIEW_LOOKUPDHTTP || '127.0.0.1:4161'),
+  nsqdTCPAddresses: (process.env.NSQ_VIEW_NSQDTCP || '127.0.0.1:4150'),
 };
 
 // declare globals
@@ -25,16 +26,16 @@ var getTopics = function() {
       var resp = JSON.parse(body);
 
       //if all topics are new
-      if (nsqTopics.length == 0 && resp.data.topics.length > 0) {
+      if (nsqTopics.length == 0 && resp.topics.length > 0) {
         console.log('registering all nsqTopics...');
-        _.each(resp.data.topics, function(topic) {
+        _.each(resp.topics, function(topic) {
           console.log('topic: ' + topic);
           nsqTopics.push(topic);
           io.emit('app:msg', 'found topic: ' + topic);
           io.emit('topic:list', nsqTopics);
         })
       } else {
-        var newTopics = _.difference(resp.data.topics, nsqTopics);
+        var newTopics = _.difference(resp.topics, nsqTopics);
         if (newTopics.length > 0) console.log('registering new nsqTopics...');
         _.each(newTopics, function(topic) {
           console.log('new topic: ' + topic);
