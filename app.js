@@ -62,7 +62,7 @@ var io = require('socket.io')(http);
 
 
 app.get('/', function(req, res) {
-  res.sendfile('index.html');
+  res.sendFile('index.html', {root: __dirname});
 });
 
 io.on('connection', function(socket) {
